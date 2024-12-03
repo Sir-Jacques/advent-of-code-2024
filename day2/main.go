@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -12,18 +12,15 @@ import (
 func main() {
 	// Read input
 	_, filename, _, _ := runtime.Caller(0)
-	moduleDir := filepath.Dir(filename)
-	input := readInput(fmt.Sprintf("%s/input.txt", moduleDir))
+	input := readInput(filepath.Join(filepath.Dir(filename), "input.txt"))
 
-	reports := [][]int{}
-
-	for _, r := range input {
-		// Parse space seperated ints into int slice
-		reportStrings := strings.Split(r, " ")
-
-		report := []int{}
-		for _, v := range reportStrings {
-			val, _ := strconv.Atoi(v)
+	// Parse reports
+	var reports [][]int
+	for _, line := range input {
+		nums := strings.Fields(line)
+		var report []int
+		for _, num := range nums {
+			val, _ := strconv.Atoi(num)
 			report = append(report, val)
 		}
 		reports = append(reports, report)
@@ -31,8 +28,8 @@ func main() {
 
 	// Part 1
 	count := 0
-	for _, i := range reports {
-		if isSafe(i) {
+	for _, report := range reports {
+		if isSafe(report) {
 			count++
 		}
 	}
@@ -40,8 +37,8 @@ func main() {
 
 	// Part 2
 	dampenedCount := 0
-	for _, i := range reports {
-		if isSafeDampened(i) {
+	for _, report := range reports {
+		if isSafeDampened(report) {
 			dampenedCount++
 		}
 	}
@@ -49,62 +46,51 @@ func main() {
 }
 
 func isSafeDampened(report []int) bool {
-	dampenedReports := generateDampenedReports(report)
-
-	for _, r := range dampenedReports {
+	for _, r := range generateDampenedReports(report) {
 		if isSafe(r) {
 			return true
 		}
 	}
-
 	return false
 }
 
 func generateDampenedReports(report []int) [][]int {
-	result := [][]int{}
-
-	// Keep input in output
+	var result [][]int
 	result = append(result, report)
-
-	// Append output with input minus one element (all commutations)
-	for i := 0; i < len(report); i++ {
+	for i := range report {
 		subresult := []int{}
-		for j := 0; j < len(report); j++ {
+		for j, val := range report {
 			if j != i {
-				subresult = append(subresult, report[j])
+				subresult = append(subresult, val)
 			}
 		}
 		result = append(result, subresult)
 	}
-
 	return result
 }
 
 func isSafe(report []int) bool {
-	decreasing := false
-	if report[0] > report[1] {
-		decreasing = true
-	}
-
-	// Check if all are decreasing by 1 or 2 compared to the previous element
+	decreasing := report[0] > report[1]
 	for i := 1; i < len(report); i++ {
-		if decreasing && report[i]-report[i-1] != -1 && report[i]-report[i-1] != -2 && report[i]-report[i-1] != -3 {
+		diff := report[i] - report[i-1]
+
+		// Decreasing report
+		if decreasing && diff != -1 && diff != -2 && diff != -3 {
 			return false
 		}
 
-		if !decreasing && report[i]-report[i-1] != 1 && report[i]-report[i-1] != 2 && report[i]-report[i-1] != 3 {
+		// Increasing report
+		if !decreasing && diff != 1 && diff != 2 && diff != 3 {
 			return false
 		}
 	}
-
 	return true
 }
 
 func readInput(filename string) []string {
-	content, err := ioutil.ReadFile(filename)
+	content, err := os.ReadFile(filename)
 	if err != nil {
 		fmt.Println(err)
 	}
-
 	return strings.Split(string(content), "\n")
 }

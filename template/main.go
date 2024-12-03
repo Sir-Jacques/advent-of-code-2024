@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -11,16 +11,18 @@ import (
 func main() {
 	// Read input
 	_, filename, _, _ := runtime.Caller(0)
-	moduleDir := filepath.Dir(filename)
-	input := readInput(fmt.Sprintf("%s/input.txt", moduleDir))
+	input := readInput(filepath.Join(filepath.Dir(filename), "input.txt"))
+
+	// Part 1
+
+	// Part 2
 
 }
 
 func readInput(filename string) []string {
-	content, err := ioutil.ReadFile(filename)
+	content, err := os.ReadFile(filename)
 	if err != nil {
 		fmt.Println(err)
 	}
-
 	return strings.Split(string(content), "\n")
 }
