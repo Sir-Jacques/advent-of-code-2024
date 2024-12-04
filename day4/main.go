@@ -9,8 +9,7 @@ import (
 )
 
 type CrossWord struct {
-	horizontals []string
-	grid        [][]uint8
+	grid [][]uint8
 }
 
 func main() {
@@ -18,8 +17,7 @@ func main() {
 	_, filename, _, _ := runtime.Caller(0)
 	input := readInput(filepath.Join(filepath.Dir(filename), "input.txt"))
 
-	crossWord := CrossWord{horizontals: input}
-	crossWord.generateGrid()
+	crossWord := newCrossWord(input)
 
 	// Part 1
 	xmasCount := 0
@@ -86,11 +84,12 @@ func (cw *CrossWord) matchSubstringsForPosition(xPos int, yPos int, xDiff int, y
 	return true
 }
 
-func (cw *CrossWord) generateGrid() {
-	cw.grid = make([][]uint8, len(cw.horizontals))
-	for i, word := range cw.horizontals {
-		cw.grid[i] = []uint8(word)
+func newCrossWord(horizontals []string) CrossWord {
+	grid := make([][]uint8, len(horizontals))
+	for i, word := range horizontals {
+		grid[i] = []uint8(word)
 	}
+	return CrossWord{grid: grid}
 }
 
 func readInput(filename string) []string {
