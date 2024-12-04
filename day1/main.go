@@ -28,7 +28,7 @@ func main() {
 
 	// Part 1
 	difference := 0
-	for k, _ := range slice1 {
+	for k := range slice1 {
 		difference += aoc.Abs(slice2[k] - slice1[k])
 	}
 	fmt.Println(difference)

@@ -2,9 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"strings"
-
 	aoc "github.com/sir-jacques/advent-of-code-2024/helpers"
 )
 
@@ -89,12 +86,4 @@ func newCrossWord(horizontals []string) CrossWord {
 		grid[i] = []uint8(word)
 	}
 	return CrossWord{grid: grid}
-}
-
-func readInput(filename string) []string {
-	content, err := os.ReadFile(filename)
-	if err != nil {
-		fmt.Println(err)
-	}
-	return strings.Split(string(content), "\n")
 }
