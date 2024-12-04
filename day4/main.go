@@ -21,9 +21,9 @@ func main() {
 
 	// Part 1
 	xmasCount := 0
-	for i := 0; i < len(crossWord.grid); i++ {
-		for j := 0; j < len(crossWord.grid[i]); j++ {
-			xmasCount += crossWord.matchSubstringAllDirs(i, j, "XMAS")
+	for y := 0; y < len(crossWord.grid); y++ {
+		for x := 0; x < len(crossWord.grid[y]); x++ {
+			xmasCount += crossWord.matchSubstringAllDirs(y, x, "XMAS")
 		}
 	}
 
