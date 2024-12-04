@@ -23,7 +23,7 @@ func main() {
 	xmasCount := 0
 	for y := 0; y < len(crossWord.grid); y++ {
 		for x := 0; x < len(crossWord.grid[y]); x++ {
-			xmasCount += crossWord.matchSubstringAllDirs(y, x, "XMAS")
+			xmasCount += crossWord.matchSubstringAllDirs(x, y, "XMAS")
 		}
 	}
 
