@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
-	"runtime"
 	"strings"
+
+	aoc "github.com/sir-jacques/advent-of-code-2024/helpers"
 )
 
 type CrossWord struct {
@@ -14,8 +14,7 @@ type CrossWord struct {
 
 func main() {
 	// Read input
-	_, filename, _, _ := runtime.Caller(0)
-	input := readInput(filepath.Join(filepath.Dir(filename), "input.txt"))
+	input := aoc.ReadInput("input.txt")
 
 	crossWord := newCrossWord(input)
 

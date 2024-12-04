@@ -2,18 +2,16 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
-	"runtime"
 	"sort"
 	"strconv"
 	"strings"
+
+	aoc "github.com/sir-jacques/advent-of-code-2024/helpers"
 )
 
 func main() {
 	// Read input
-	_, filename, _, _ := runtime.Caller(0)
-	input := readInput(filepath.Join(filepath.Dir(filename), "input.txt"))
+	input := aoc.ReadInput("input.txt")
 
 	var slice1 []int
 	var slice2 []int
@@ -31,39 +29,14 @@ func main() {
 	// Part 1
 	difference := 0
 	for k, _ := range slice1 {
-		difference += abs(slice2[k] - slice1[k])
+		difference += aoc.Abs(slice2[k] - slice1[k])
 	}
 	fmt.Println(difference)
 
 	// Part 2
 	similarity := 0
 	for _, v := range slice1 {
-		similarity += v * countOccurrences(slice2, v)
+		similarity += v * aoc.CountOccurrencesInList(slice2, v)
 	}
 	fmt.Println(similarity)
-}
-
-func abs(x int) int {
-	if x < 0 {
-		return -x
-	}
-	return x
-}
-
-func countOccurrences(slice []int, element int) int {
-	count := 0
-	for _, v := range slice {
-		if v == element {
-			count++
-		}
-	}
-	return count
-}
-
-func readInput(filename string) []string {
-	content, err := os.ReadFile(filename)
-	if err != nil {
-		fmt.Println(err)
-	}
-	return strings.Split(string(content), "\n")
 }
