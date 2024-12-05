@@ -10,13 +10,13 @@ import (
 
 // A rule describes which page must come before the other
 type Rule struct {
-	before string
-	after  string
+	before int
+	after  int
 }
 
 type Book struct {
-	pages        []string
-	indexedPages map[string]int
+	pages        []int
+	indexedPages map[int]int
 }
 
 func main() {
@@ -26,21 +26,29 @@ func main() {
 	// Parse input
 	var rules []Rule
 	var books []Book
-	sector := 0
+	inputSector := 0
 	for _, line := range input {
 		// Next sector
 		if line == "" {
-			sector++
+			inputSector++
 			continue
 		}
 
-		switch sector {
+		switch inputSector {
 		case 0:
 			// Parse rule
 			vals := strings.Split(line, "|")
-			rules = append(rules, Rule{before: vals[0], after: vals[1]})
+			beforePage, _ := strconv.Atoi(vals[0])
+			afterPage, _ := strconv.Atoi(vals[1])
+			rules = append(rules, Rule{before: beforePage, after: afterPage})
 		case 1:
-			pages := strings.Split(line, ",")
+			// Parse Book
+			var pages []int
+			stringPages := strings.Split(line, ",")
+			for _, p := range stringPages {
+				intPage, _ := strconv.Atoi(p)
+				pages = append(pages, intPage)
+			}
 			book := Book{pages: pages}
 			book.indexPages()
 			books = append(books, book)
@@ -53,8 +61,7 @@ func main() {
 	sumOfCorrectMiddlePages := 0
 	for _, book := range books {
 		if book.followsAllRules(rules) {
-			middlePageInt, _ := strconv.Atoi(book.getMiddlePage())
-			sumOfCorrectMiddlePages += middlePageInt
+			sumOfCorrectMiddlePages += book.getMiddlePage()
 		}
 	}
 
@@ -63,8 +70,7 @@ func main() {
 	for _, book := range books {
 		if !book.followsAllRules(rules) {
 			book.fixPages(rules)
-			middlePageInt, _ := strconv.Atoi(book.getMiddlePage())
-			sumOfFixedMiddlePages += middlePageInt
+			sumOfFixedMiddlePages += book.getMiddlePage()
 		}
 	}
 
@@ -95,14 +101,14 @@ func (b *Book) fixPages(rules []Rule) {
 }
 
 func (b *Book) indexPages() {
-	b.indexedPages = make(map[string]int)
+	b.indexedPages = make(map[int]int)
 	for i, page := range b.pages {
 		b.indexedPages[page] = i
 	}
 }
 
 // Part 1
-func (b *Book) getMiddlePage() string {
+func (b *Book) getMiddlePage() int {
 	middleIndex := len(b.pages) / 2
 	return b.pages[middleIndex]
 }
