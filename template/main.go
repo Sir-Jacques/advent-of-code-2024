@@ -6,7 +6,6 @@ import (
 
 func main() {
 	// Read input
-	//_, filename, _, _ := runtime.Caller(0)
 	input := aoc.ReadInput("input.txt")
 
 	// Part 1
