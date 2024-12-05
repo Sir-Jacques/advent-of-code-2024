@@ -9,13 +9,11 @@ import (
 )
 
 type Rule struct {
-	before int
-	after  int
+	first int
+	later int
 }
 
-type Book struct {
-	pages []int
-}
+type UpdateOrder []int
 
 func main() {
 	// Read input
@@ -23,7 +21,7 @@ func main() {
 
 	// Parse input
 	var rules []Rule
-	var books []Book
+	var updateOrders []UpdateOrder
 	inputSector := 0
 	for _, line := range input {
 		if line == "" {
@@ -35,65 +33,69 @@ func main() {
 		case 0:
 			// Parse Rule
 			vals := strings.Split(line, "|")
-			beforePage, _ := strconv.Atoi(vals[0])
-			afterPage, _ := strconv.Atoi(vals[1])
-			rules = append(rules, Rule{before: beforePage, after: afterPage})
+			firstUpdate, _ := strconv.Atoi(vals[0])
+			laterUpdate, _ := strconv.Atoi(vals[1])
+			rules = append(rules, Rule{first: firstUpdate, later: laterUpdate})
 		case 1:
-			// Parse Book
-			stringPages := strings.Split(line, ",")
-			pages := make([]int, len(stringPages))
-			for i, p := range stringPages {
-				pages[i], _ = strconv.Atoi(p)
+			// Parse UpdateOrder
+			updateList := strings.Split(line, ",")
+			updateOrder := make([]int, len(updateList))
+			for i, p := range updateList {
+				updateOrder[i], _ = strconv.Atoi(p)
 			}
-			books = append(books, Book{pages: pages})
+			updateOrders = append(updateOrders, updateOrder)
 		}
 	}
 
 	// Part 1
 	sumOfCorrectMiddlePages := 0
-	for _, book := range books {
-		if book.followsAllRules(rules) {
-			sumOfCorrectMiddlePages += book.getMiddlePage()
+	for _, updateOrder := range updateOrders {
+		if updateOrder.followsAllRules(rules) {
+			sumOfCorrectMiddlePages += updateOrder.getMiddlePage()
 		}
 	}
 	fmt.Println(sumOfCorrectMiddlePages)
 
 	// Part 2
 	sumOfFixedMiddlePages := 0
-	for _, book := range books {
-		if !book.followsAllRules(rules) {
-			book.fixPages(rules)
-			sumOfFixedMiddlePages += book.getMiddlePage()
+	for _, updateOrder := range updateOrders {
+		if !updateOrder.followsAllRules(rules) {
+			updateOrder.fixUpdateOrder(rules)
+			sumOfFixedMiddlePages += updateOrder.getMiddlePage()
 		}
 	}
 	fmt.Println(sumOfFixedMiddlePages)
 }
 
-func (b *Book) fixPages(rules []Rule) {
-	for i := 0; i < len(b.pages); i++ {
-		for j := i + 1; j < len(b.pages); j++ {
-			// Check if pages violate any rule, flip them if so
+func (updateOrder UpdateOrder) fixUpdateOrder(rules []Rule) {
+	// Loop over all pairs of updates
+	for i := 0; i < len(updateOrder); i++ {
+		for j := i + 1; j < len(updateOrder); j++ {
+			// Check if current order of selected 2 updates violate any rule, flip values if so (bubble sort)
 			for _, rule := range rules {
-				if b.pages[i] == rule.after && b.pages[j] == rule.before {
-					b.pages[i], b.pages[j] = b.pages[j], b.pages[i]
+				if updateOrder[i] == rule.later && updateOrder[j] == rule.first {
+					updateOrder[i], updateOrder[j] = updateOrder[j], updateOrder[i]
 				}
 			}
 		}
 	}
 }
 
-func (b *Book) getMiddlePage() int {
-	return b.pages[len(b.pages)/2]
+func (updateOrder UpdateOrder) getMiddlePage() int {
+	return updateOrder[len(updateOrder)/2]
 }
 
-func (b *Book) followsAllRules(rules []Rule) bool {
-	indexedPages := make(map[int]int)
-	for i, page := range b.pages {
-		indexedPages[page] = i
+func (updateOrder UpdateOrder) followsAllRules(rules []Rule) bool {
+	// Store update indices
+	indexedUpdates := make(map[int]int)
+	for i, update := range updateOrder {
+		indexedUpdates[update] = i
 	}
+
+	// Check if calculated indices follow all rules
 	for _, rule := range rules {
-		beforeIndex, beforeExists := indexedPages[rule.before]
-		afterIndex, afterExists := indexedPages[rule.after]
+		beforeIndex, beforeExists := indexedUpdates[rule.first]
+		afterIndex, afterExists := indexedUpdates[rule.later]
 		if beforeExists && afterExists && beforeIndex > afterIndex {
 			return false
 		}
