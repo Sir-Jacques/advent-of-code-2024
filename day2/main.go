@@ -8,15 +8,17 @@ import (
 	aoc "github.com/sir-jacques/advent-of-code-2024/helpers"
 )
 
+type Report []int
+
 func main() {
 	// Read input
 	input := aoc.ReadInput("input.txt")
 
 	// Parse reports
-	var reports [][]int
+	var reports []Report
 	for _, line := range input {
 		nums := strings.Fields(line)
-		var report []int
+		var report Report
 		for _, num := range nums {
 			val, _ := strconv.Atoi(num)
 			report = append(report, val)
@@ -43,7 +45,7 @@ func main() {
 	fmt.Println(dampenedCount)
 }
 
-func isSafeDampened(report []int) bool {
+func isSafeDampened(report Report) bool {
 	for _, r := range generateDampenedReports(report) {
 		if isSafe(r) {
 			return true
@@ -52,11 +54,11 @@ func isSafeDampened(report []int) bool {
 	return false
 }
 
-func generateDampenedReports(report []int) [][]int {
-	var result [][]int
+func generateDampenedReports(report Report) []Report {
+	var result []Report
 	result = append(result, report)
 	for i := range report {
-		subresult := []int{}
+		subresult := Report{}
 		for j, val := range report {
 			if j != i {
 				subresult = append(subresult, val)
@@ -67,18 +69,18 @@ func generateDampenedReports(report []int) [][]int {
 	return result
 }
 
-func isSafe(report []int) bool {
+func isSafe(report Report) bool {
 	decreasing := report[0] > report[1]
 	for i := 1; i < len(report); i++ {
 		diff := report[i] - report[i-1]
 
 		// Decreasing report
-		if decreasing && diff != -1 && diff != -2 && diff != -3 {
+		if decreasing && (diff > -1 || diff < -3) {
 			return false
 		}
 
 		// Increasing report
-		if !decreasing && diff != 1 && diff != 2 && diff != 3 {
+		if !decreasing && (diff < 1 || diff > 3) {
 			return false
 		}
 	}

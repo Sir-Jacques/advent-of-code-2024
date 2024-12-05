@@ -69,7 +69,7 @@ func main() {
 
 func (updateOrder UpdateOrder) fixUpdateOrder(rules []Rule) {
 	// Loop over all pairs of updates
-	for i := 0; i < len(updateOrder); i++ {
+	for i := range len(updateOrder) {
 		for j := i + 1; j < len(updateOrder); j++ {
 			// Check if current order of selected 2 updates violate any rule, flip values if so (bubble sort)
 			for _, rule := range rules {

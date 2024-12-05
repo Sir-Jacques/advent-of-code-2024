@@ -12,8 +12,8 @@ func Abs[T constraints.Integer | constraints.Float](x T) T {
 	return x
 }
 
-// CountOccurrencesInList returns the number of times the element is found in the slice
-func CountOccurrencesInList[T comparable](slice []T, element T) int {
+// CountElementInList returns the number of times the element is found in the slice
+func CountElementInList[T comparable](slice []T, element T) int {
 	count := 0
 	for _, v := range slice {
 		if v == element {
