@@ -12,20 +12,15 @@ import (
 func main() {
 	// Read input
 	input := aoc.ReadInput("input.txt")
+	fullInput := strings.Join(input, "")
 
 	// Part 1
-	result1 := 0
-	for _, line := range input {
-		result1 += getMulSummation(line)
-	}
+	result1 := getMulSummation(fullInput)
 	fmt.Println(result1)
 
 	// Part 2
-	result2 := 0
-	for _, line := range input {
-		filteredLine := regexp.MustCompile(`don't\(\).*?do\(\)`).ReplaceAllString(line+"do()", "")
-		result2 += getMulSummation(filteredLine)
-	}
+	filteredInput := regexp.MustCompile(`don't\(\).*?do\(\)`).ReplaceAllString(fullInput+"do()", "")
+	result2 := getMulSummation(filteredInput)
 	fmt.Println(result2)
 }
 
@@ -38,6 +33,5 @@ func getMulSummation(input string) int {
 		int1, _ := strconv.Atoi(nums[1])
 		result += int0 * int1
 	}
-
 	return result
 }
