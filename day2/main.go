@@ -2,9 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
-
 	aoc "github.com/sir-jacques/advent-of-code-2024/helpers"
 )
 
@@ -17,13 +14,7 @@ func main() {
 	// Parse reports
 	var reports []Report
 	for _, line := range input {
-		nums := strings.Fields(line)
-		var report Report
-		for _, num := range nums {
-			val, _ := strconv.Atoi(num)
-			report = append(report, val)
-		}
-		reports = append(reports, report)
+		reports = append(reports, aoc.ParseSeperatedInts(line, " "))
 	}
 
 	// Part 1

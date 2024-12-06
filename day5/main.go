@@ -2,9 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
-
 	aoc "github.com/sir-jacques/advent-of-code-2024/helpers"
 )
 
@@ -32,18 +29,11 @@ func main() {
 		switch inputSector {
 		case 0:
 			// Parse Rule
-			vals := strings.Split(line, "|")
-			firstUpdate, _ := strconv.Atoi(vals[0])
-			laterUpdate, _ := strconv.Atoi(vals[1])
-			rules = append(rules, Rule{first: firstUpdate, later: laterUpdate})
+			vals := aoc.ParseSeperatedInts(line, "|")
+			rules = append(rules, Rule{first: vals[0], later: vals[1]})
 		case 1:
 			// Parse UpdateOrder
-			updateList := strings.Split(line, ",")
-			updateOrder := make([]int, len(updateList))
-			for i, p := range updateList {
-				updateOrder[i], _ = strconv.Atoi(p)
-			}
-			updateOrders = append(updateOrders, updateOrder)
+			updateOrders = append(updateOrders, aoc.ParseSeperatedInts(line, ","))
 		}
 	}
 

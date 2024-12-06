@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"regexp"
-	"strconv"
 	"strings"
 
 	aoc "github.com/sir-jacques/advent-of-code-2024/helpers"
@@ -24,14 +23,13 @@ func main() {
 	fmt.Println(result2)
 }
 
+// getMulSummation parses and returns result of mul() instruction in input string
 func getMulSummation(input string) int {
 	result := 0
 	re := regexp.MustCompile(`mul\(\d+,\d+\)`)
 	for _, match := range re.FindAllString(input, -1) {
-		nums := strings.Split(match[4:len(match)-1], ",")
-		int0, _ := strconv.Atoi(nums[0])
-		int1, _ := strconv.Atoi(nums[1])
-		result += int0 * int1
+		mulNums := aoc.ParseSeperatedInts(match[4:len(match)-1], ",")
+		result += mulNums[0] * mulNums[1]
 	}
 	return result
 }

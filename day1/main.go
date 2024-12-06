@@ -2,11 +2,8 @@ package main
 
 import (
 	"fmt"
-	"sort"
-	"strconv"
-	"strings"
-
 	aoc "github.com/sir-jacques/advent-of-code-2024/helpers"
+	"sort"
 )
 
 func main() {
@@ -16,11 +13,9 @@ func main() {
 	var list0 []int
 	var list1 []int
 	for _, i := range input {
-		words := strings.Split(i, "   ")
-		num0, _ := strconv.Atoi(words[0])
-		num1, _ := strconv.Atoi(words[1])
-		list0 = append(list0, num0)
-		list1 = append(list1, num1)
+		vals := aoc.ParseSeperatedInts(i, "   ")
+		list0 = append(list0, vals[0])
+		list1 = append(list1, vals[1])
 	}
 
 	sort.Ints(list0)
