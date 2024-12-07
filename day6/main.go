@@ -71,7 +71,7 @@ func (g *Guard) isInBounds(board Board) bool {
 func isValidMove(board Board, pos Position, xDiff, yDiff int) bool {
 	newX, newY := pos.x+xDiff, pos.y+yDiff
 	if newX < 0 || newX >= len(board[0]) || newY < 0 || newY >= len(board) {
-		return true // Out of bounds is okay
+		return true // Allowed to walk out of bounds
 	}
 	return !board[newY][newX] // If there is a wall, it's not a valid move
 }
@@ -84,29 +84,28 @@ func (g *Guard) calculatePath(board Board) (traces map[Position]bool, loop bool)
 	traces = make(map[Position]bool)
 	guardStates := make(map[Guard]bool)
 	for g.isInBounds(board) {
-		if g.move(board, guardStates, traces) {
-			return traces, true
+		// Move guard
+		g.move(board)
+
+		// Check if guard is now out of bounds
+		if !g.isInBounds(board) {
+			return traces, false
 		}
+
+		// Check if state was seen before (thus entering loop)
+		if _, exists := guardStates[*g]; exists {
+			return traces, true // We've already seen this state
+		}
+
+		// Store (new) state
+		guardStates[*g] = true
+		traces[g.pos] = true
 	}
 
 	return traces, false
 }
 
-func (g *Guard) move(board Board, guardStates map[Guard]bool, traces map[Position]bool) (loop bool) {
-	// Check if out of bounds
-	if !g.isInBounds(board) {
-		return false
-	}
-
-	// Check if state was seen before (thus entering loop)
-	if _, exists := guardStates[*g]; exists {
-		return true // We've already seen this state
-	}
-
-	// Store (new) state
-	guardStates[*g] = true
-	traces[g.pos] = true
-
+func (g *Guard) move(board Board) {
 	// Move guard if possible, switch direction otherwise
 	if g.dir == 0 && isValidMove(board, g.pos, 0, -1) {
 		g.pos.y--
@@ -120,5 +119,5 @@ func (g *Guard) move(board Board, guardStates map[Guard]bool, traces map[Positio
 		g.dir = (g.dir + 1) % 4
 	}
 
-	return false
+	return
 }
