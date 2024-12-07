@@ -35,31 +35,23 @@ func main() {
 		board[y] = row
 	}
 
-	// Part 1
+	// Part 1, count traces
 	guard := startGuard
 	traces, _ := guard.calculatePath(board)
 	fmt.Println(len(traces))
 
-	// Part 2
+	// Part 2, placing new obstruction somewhere on the previous traces (other positions are never visited by guard)
 	validObstructionCount := 0
-	for y, row := range board {
-		for x, cell := range row {
-			// If position is already a wall or guard never visits here, skip
-			if cell || !traces[Position{x: x, y: y}] {
-				continue
-			}
+	for pos, _ := range traces {
+		// Copy board and add new obstruction
+		modifiedBoard := Board(aoc.Copy2DSlice(board))
+		modifiedBoard[pos.y][pos.x] = true
 
-			// Copy board and add new obstruction
-			modifiedBoard := Board(aoc.Copy2DSlice(board))
-			modifiedBoard[y][x] = true
-
-			// Check if path is a loop
-			_, loop := guard.calculatePath(modifiedBoard)
-			if loop {
-				validObstructionCount++
-			}
+		// Check if path is a loop
+		_, loop := guard.calculatePath(modifiedBoard)
+		if loop {
+			validObstructionCount++
 		}
-
 	}
 	fmt.Println(validObstructionCount)
 }
