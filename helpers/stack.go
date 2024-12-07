@@ -21,3 +21,7 @@ func (s *Stack[T]) Pop() T {
 func (s *Stack[T]) IsEmpty() bool {
 	return len(s.items) == 0
 }
+
+func (s *Stack[T]) Peek() T {
+	return s.items[len(s.items)-1]
+}

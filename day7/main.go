@@ -13,7 +13,7 @@ type Problem struct {
 	numbers []int
 }
 
-type QueueItem struct {
+type ProblemNode struct {
 	currentValue     int
 	remainingNumbers []int
 }
@@ -62,14 +62,14 @@ func (p Problem) solveBFS(includeConcatOperation bool) bool {
 		return p.numbers[0] == p.target
 	}
 
-	// Enqueue initial node
-	queue := aoc.NewQueue[QueueItem]()
-	queue.Enqueue(QueueItem{currentValue: p.numbers[0], remainingNumbers: p.numbers[1:]})
+	// Push initial node
+	stack := aoc.NewStack[ProblemNode]()
+	stack.Push(ProblemNode{currentValue: p.numbers[0], remainingNumbers: p.numbers[1:]})
 
-	// BFS
-	for !queue.IsEmpty() {
-		// Dequeue and validate item, finish if target is reached
-		item := queue.Dequeue()
+	// DFS
+	for !stack.IsEmpty() {
+		// Pop item and check if we're finished
+		item := stack.Pop()
 		if len(item.remainingNumbers) == 0 {
 			if item.currentValue == p.target {
 				return true
@@ -77,29 +77,29 @@ func (p Problem) solveBFS(includeConcatOperation bool) bool {
 			continue
 		}
 
-		// Enqueue child nodes
-		queue.Enqueue(item.getAdditionChild())
-		queue.Enqueue(item.getMultiplicationChild())
+		// Push child nodes
+		stack.Push(item.getAdditionChild())
+		stack.Push(item.getMultiplicationChild())
 		if includeConcatOperation {
-			queue.Enqueue(item.getConcatChild())
+			stack.Push(item.getConcatChild())
 		}
 	}
 
 	return false
 }
 
-func (qi *QueueItem) getAdditionChild() QueueItem {
-	return QueueItem{
+func (qi *ProblemNode) getAdditionChild() ProblemNode {
+	return ProblemNode{
 		currentValue:     qi.currentValue + qi.remainingNumbers[0],
 		remainingNumbers: qi.remainingNumbers[1:]}
 }
-func (qi *QueueItem) getMultiplicationChild() QueueItem {
-	return QueueItem{
+func (qi *ProblemNode) getMultiplicationChild() ProblemNode {
+	return ProblemNode{
 		currentValue:     qi.currentValue * qi.remainingNumbers[0],
 		remainingNumbers: qi.remainingNumbers[1:]}
 }
-func (qi *QueueItem) getConcatChild() QueueItem {
-	return QueueItem{
+func (qi *ProblemNode) getConcatChild() ProblemNode {
+	return ProblemNode{
 		currentValue:     concatInts(qi.currentValue, qi.remainingNumbers[0]),
 		remainingNumbers: qi.remainingNumbers[1:],
 	}

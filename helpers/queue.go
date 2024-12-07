@@ -29,3 +29,7 @@ func (q *Queue[T]) Dequeue() T {
 func (q *Queue[T]) IsEmpty() bool {
 	return q.head >= len(q.items)
 }
+
+func (q *Queue[T]) Peek() T {
+	return q.items[q.head]
+}
