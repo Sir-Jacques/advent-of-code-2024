@@ -17,6 +17,7 @@ type Guard struct {
 }
 
 var startGuard Guard
+var guard Guard
 
 func main() {
 	// Read input
@@ -36,11 +37,10 @@ func main() {
 	}
 
 	// Part 1, count traces
-	guard := startGuard
 	traces, _ := guard.calculatePath(board)
 	fmt.Println(len(traces))
 
-	// Part 2, placing new obstruction somewhere on the previous traces (other positions are never visited by guard)
+	// Part 2, add obstruction somewhere on traces (other positions are never visited by guard)
 	validObstructionCount := 0
 	for pos, _ := range traces {
 		// Copy board and add new obstruction
