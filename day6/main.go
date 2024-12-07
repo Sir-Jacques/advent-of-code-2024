@@ -8,8 +8,7 @@ import (
 type Board [][]bool
 
 type Position struct {
-	x int
-	y int
+	x, y int
 }
 
 type Guard struct {
@@ -17,7 +16,6 @@ type Guard struct {
 	dir int
 }
 
-var board Board
 var startGuard Guard
 
 func main() {
@@ -27,9 +25,9 @@ func main() {
 	// Parse board
 	board := make(Board, len(input))
 	for y, line := range input {
-		var row []bool
+		row := make([]bool, len(line))
 		for x, char := range line {
-			row = append(row, char == '#')
+			row[x] = char == '#' // Wall
 			if char == '^' {
 				startGuard = Guard{pos: Position{x: x, y: y}, dir: 0}
 			}
@@ -37,25 +35,25 @@ func main() {
 		board[y] = row
 	}
 
-	// Move while guard is inside the board
+	// Part 1
 	guard := startGuard
 	traces, _ := guard.calculatePath(board)
 	fmt.Println(len(traces))
 
 	// Part 2
 	validObstructionCount := 0
-	for y := range board {
-		for x := range board[y] {
+	for y, row := range board {
+		for x, cell := range row {
 			// If position is already a wall or guard never visits here, skip
-			if board[y][x] || !traces[Position{x: x, y: y}] {
+			if cell || !traces[Position{x: x, y: y}] {
 				continue
 			}
 
-			// Copy and modify board, reset guard
+			// Copy board and add new obstruction
 			modifiedBoard := Board(aoc.Copy2DSlice(board))
 			modifiedBoard[y][x] = true
 
-			// Move while guard is inside the board
+			// Check if path is a loop
 			_, loop := guard.calculatePath(modifiedBoard)
 			if loop {
 				validObstructionCount++
@@ -71,8 +69,7 @@ func (g *Guard) isInBounds(board Board) bool {
 }
 
 func isValidMove(board Board, pos Position, xDiff, yDiff int) bool {
-	newX := pos.x + xDiff
-	newY := pos.y + yDiff
+	newX, newY := pos.x+xDiff, pos.y+yDiff
 	if newX < 0 || newX >= len(board[0]) || newY < 0 || newY >= len(board) {
 		return true // Out of bounds is okay
 	}
@@ -80,15 +77,14 @@ func isValidMove(board Board, pos Position, xDiff, yDiff int) bool {
 }
 
 func (g *Guard) calculatePath(board Board) (traces map[Position]bool, loop bool) {
-	g.pos = startGuard.pos
-	g.dir = startGuard.dir
+	// Reset guard
+	g.pos, g.dir = startGuard.pos, startGuard.dir
 
+	// Move guard until loop or out of bounds
 	traces = make(map[Position]bool)
 	guardStates := make(map[Guard]bool)
 	for g.isInBounds(board) {
-
-		debug := g.move(board, guardStates, traces)
-		if debug {
+		if g.move(board, guardStates, traces) {
 			return traces, true
 		}
 	}
@@ -102,13 +98,12 @@ func (g *Guard) move(board Board, guardStates map[Guard]bool, traces map[Positio
 		return false
 	}
 
-	// Check if state was seen before (entering loop)
-	_, exists := guardStates[*g]
-	if exists {
+	// Check if state was seen before (thus entering loop)
+	if _, exists := guardStates[*g]; exists {
 		return true // We've already seen this state
 	}
 
-	// Store state
+	// Store (new) state
 	guardStates[*g] = true
 	traces[g.pos] = true
 
