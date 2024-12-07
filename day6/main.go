@@ -2,10 +2,14 @@ package main
 
 import (
 	"fmt"
+
 	aoc "github.com/sir-jacques/advent-of-code-2024/helpers"
 )
 
-type Board [][]bool
+type Board struct {
+	walls      [][]bool
+	startGuard Guard
+}
 
 type Position struct {
 	x, y int
@@ -16,36 +20,35 @@ type Guard struct {
 	dir int
 }
 
-var startGuard Guard
-var guard Guard
-
 func main() {
 	// Read input
 	input := aoc.ReadInput("input.txt")
 
 	// Parse board
-	board := make(Board, len(input))
+	board := Board{walls: make([][]bool, len(input))}
 	for y, line := range input {
 		row := make([]bool, len(line))
 		for x, char := range line {
 			row[x] = char == '#' // Wall
 			if char == '^' {
-				startGuard = Guard{pos: Position{x: x, y: y}, dir: 0}
+				board.startGuard = Guard{pos: Position{x: x, y: y}, dir: 0}
 			}
 		}
-		board[y] = row
+		board.walls[y] = row
 	}
 
 	// Part 1, count traces
+	var guard Guard
 	traces, _ := guard.calculatePath(board)
 	fmt.Println(len(traces))
 
 	// Part 2, add obstruction somewhere on traces (other positions are never visited by guard)
 	validObstructionCount := 0
-	for pos, _ := range traces {
+	for pos := range traces {
 		// Copy board and add new obstruction
-		modifiedBoard := Board(aoc.Copy2DSlice(board))
-		modifiedBoard[pos.y][pos.x] = true
+		modifiedBoard := board
+		modifiedBoard.walls = aoc.Copy2DSlice(board.walls)
+		modifiedBoard.walls[pos.y][pos.x] = true
 
 		// Check if path is a loop
 		_, loop := guard.calculatePath(modifiedBoard)
@@ -57,24 +60,24 @@ func main() {
 }
 
 func (g *Guard) isInBounds(board Board) bool {
-	return g.pos.x >= 0 && g.pos.x < len(board[0]) && g.pos.y >= 0 && g.pos.y < len(board)
+	return g.pos.x >= 0 && g.pos.x < len(board.walls[0]) && g.pos.y >= 0 && g.pos.y < len(board.walls)
 }
 
 func isValidMove(board Board, pos Position, xDiff, yDiff int) bool {
 	newX, newY := pos.x+xDiff, pos.y+yDiff
-	if newX < 0 || newX >= len(board[0]) || newY < 0 || newY >= len(board) {
+	if newX < 0 || newX >= len(board.walls[0]) || newY < 0 || newY >= len(board.walls) {
 		return true // Allowed to walk out of bounds
 	}
-	return !board[newY][newX] // If there is a wall, it's not a valid move
+	return !board.walls[newY][newX] // If there is a wall, it's not a valid move
 }
 
-func (g *Guard) calculatePath(board Board) (traces map[Position]bool, loop bool) {
-	// Reset guard
-	g.pos, g.dir = startGuard.pos, startGuard.dir
+func (g *Guard) calculatePath(board Board) (map[Position]bool, bool) {
+	// Reset states
+	g.pos, g.dir = board.startGuard.pos, board.startGuard.dir
+	traces := make(map[Position]bool)
+	guardStates := make(map[Guard]bool)
 
 	// Move guard until loop or out of bounds
-	traces = make(map[Position]bool)
-	guardStates := make(map[Guard]bool)
 	for g.isInBounds(board) {
 		// Move guard
 		g.move(board)
@@ -110,6 +113,4 @@ func (g *Guard) move(board Board) {
 	} else {
 		g.dir = (g.dir + 1) % 4
 	}
-
-	return
 }
