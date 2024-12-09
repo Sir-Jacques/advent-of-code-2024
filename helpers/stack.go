@@ -25,3 +25,14 @@ func (s *Stack[T]) IsEmpty() bool {
 func (s *Stack[T]) Peek() T {
 	return s.items[len(s.items)-1]
 }
+
+type StackItem[T any] struct {
+	Accumulator      T
+	RemainingNumbers []T
+}
+
+func (si *StackItem[T]) GetChild(operation func(T, T) T) *StackItem[T] {
+	return &StackItem[T]{
+		Accumulator:      operation(si.Accumulator, si.RemainingNumbers[0]),
+		RemainingNumbers: si.RemainingNumbers[1:]}
+}
