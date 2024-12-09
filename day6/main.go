@@ -11,12 +11,8 @@ type Board struct {
 	startGuard Guard
 }
 
-type Position struct {
-	x, y int
-}
-
 type Guard struct {
-	pos Position
+	pos aoc.Position
 	dir int
 }
 
@@ -31,7 +27,7 @@ func main() {
 		for x, char := range line {
 			row[x] = char == '#' // Wall
 			if char == '^' {
-				board.startGuard = Guard{pos: Position{x: x, y: y}, dir: 0}
+				board.startGuard = Guard{pos: aoc.Position{X: x, Y: y}, dir: 0}
 			}
 		}
 		board.walls[y] = row
@@ -48,7 +44,7 @@ func main() {
 		// Copy board and add new obstruction
 		modifiedBoard := board
 		modifiedBoard.walls = aoc.Copy2DSlice(board.walls)
-		modifiedBoard.walls[pos.y][pos.x] = true
+		modifiedBoard.walls[pos.Y][pos.X] = true
 
 		// Check if path is a loop
 		_, loop := guard.calculatePath(modifiedBoard)
@@ -60,21 +56,21 @@ func main() {
 }
 
 func (g *Guard) isInBounds(board Board) bool {
-	return g.pos.x >= 0 && g.pos.x < len(board.walls[0]) && g.pos.y >= 0 && g.pos.y < len(board.walls)
+	return g.pos.X >= 0 && g.pos.X < len(board.walls[0]) && g.pos.Y >= 0 && g.pos.Y < len(board.walls)
 }
 
-func isValidMove(board Board, pos Position, xDiff, yDiff int) bool {
-	newX, newY := pos.x+xDiff, pos.y+yDiff
+func isValidMove(board Board, pos aoc.Position, xDiff, yDiff int) bool {
+	newX, newY := pos.X+xDiff, pos.Y+yDiff
 	if newX < 0 || newX >= len(board.walls[0]) || newY < 0 || newY >= len(board.walls) {
 		return true // Allowed to walk out of bounds
 	}
 	return !board.walls[newY][newX] // If there is a wall, it's not a valid move
 }
 
-func (g *Guard) calculatePath(board Board) (map[Position]bool, bool) {
+func (g *Guard) calculatePath(board Board) (map[aoc.Position]bool, bool) {
 	// Reset states
 	g.pos, g.dir = board.startGuard.pos, board.startGuard.dir
-	traces := make(map[Position]bool)
+	traces := make(map[aoc.Position]bool)
 	guardStates := make(map[Guard]bool)
 
 	// Move guard until loop or out of bounds
@@ -103,13 +99,13 @@ func (g *Guard) calculatePath(board Board) (map[Position]bool, bool) {
 func (g *Guard) move(board Board) {
 	// Move guard if possible, switch direction otherwise
 	if g.dir == 0 && isValidMove(board, g.pos, 0, -1) {
-		g.pos.y--
+		g.pos.Y--
 	} else if g.dir == 1 && isValidMove(board, g.pos, 1, 0) {
-		g.pos.x++
+		g.pos.X++
 	} else if g.dir == 2 && isValidMove(board, g.pos, 0, 1) {
-		g.pos.y++
+		g.pos.Y++
 	} else if g.dir == 3 && isValidMove(board, g.pos, -1, 0) {
-		g.pos.x--
+		g.pos.X--
 	} else {
 		g.dir = (g.dir + 1) % 4
 	}
