@@ -13,8 +13,8 @@ type Problem struct {
 	numbers []int
 }
 
-type ProblemNode struct {
-	currentValue     int
+type Node struct {
+	accumulator      int
 	remainingNumbers []int
 }
 
@@ -33,7 +33,7 @@ func main() {
 	// Part 1
 	sum1 := 0
 	for _, problem := range problems {
-		solved := problem.solveBFS(false)
+		solved := problem.solveDFS(false)
 		if solved {
 			sum1 += problem.target
 		}
@@ -43,7 +43,7 @@ func main() {
 	// Part 2
 	sum2 := 0
 	for _, problem := range problems {
-		solved := problem.solveBFS(true)
+		solved := problem.solveDFS(true)
 		if solved {
 			sum2 += problem.target
 		}
@@ -51,27 +51,27 @@ func main() {
 	fmt.Println(sum2)
 }
 
-func (p Problem) solveBFS(includeConcatOperation bool) bool {
+func (p *Problem) solveDFS(includeConcatOperation bool) bool {
 	// Empty input
 	if len(p.numbers) == 0 {
 		return false
 	}
 
-	// Single number must match to solve
+	// Single number must match target to solve
 	if len(p.numbers) == 1 {
 		return p.numbers[0] == p.target
 	}
 
 	// Push initial node
-	stack := aoc.NewStack[ProblemNode]()
-	stack.Push(ProblemNode{currentValue: p.numbers[0], remainingNumbers: p.numbers[1:]})
+	stack := aoc.NewStack[*Node]()
+	stack.Push(&Node{accumulator: p.numbers[0], remainingNumbers: p.numbers[1:]})
 
 	// DFS
 	for !stack.IsEmpty() {
 		// Pop item and check if we're finished
 		item := stack.Pop()
 		if len(item.remainingNumbers) == 0 {
-			if item.currentValue == p.target {
+			if item.accumulator == p.target {
 				return true
 			}
 			continue
@@ -88,9 +88,9 @@ func (p Problem) solveBFS(includeConcatOperation bool) bool {
 	return false
 }
 
-func (qi *ProblemNode) getChild(operation func(int, int) int) ProblemNode {
-	return ProblemNode{
-		currentValue:     operation(qi.currentValue, qi.remainingNumbers[0]),
+func (qi *Node) getChild(operation func(int, int) int) *Node {
+	return &Node{
+		accumulator:      operation(qi.accumulator, qi.remainingNumbers[0]),
 		remainingNumbers: qi.remainingNumbers[1:]}
 }
 
