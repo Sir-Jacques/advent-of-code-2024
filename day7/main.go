@@ -78,31 +78,20 @@ func (p Problem) solveBFS(includeConcatOperation bool) bool {
 		}
 
 		// Push child nodes
-		stack.Push(item.getAdditionChild())
-		stack.Push(item.getMultiplicationChild())
+		stack.Push(item.getChild(func(a, b int) int { return a + b })) // Addition
+		stack.Push(item.getChild(func(a, b int) int { return a * b })) // Multiplication
 		if includeConcatOperation {
-			stack.Push(item.getConcatChild())
+			stack.Push(item.getChild(concatInts)) // Concatenation
 		}
 	}
 
 	return false
 }
 
-func (qi *ProblemNode) getAdditionChild() ProblemNode {
+func (qi *ProblemNode) getChild(operation func(int, int) int) ProblemNode {
 	return ProblemNode{
-		currentValue:     qi.currentValue + qi.remainingNumbers[0],
+		currentValue:     operation(qi.currentValue, qi.remainingNumbers[0]),
 		remainingNumbers: qi.remainingNumbers[1:]}
-}
-func (qi *ProblemNode) getMultiplicationChild() ProblemNode {
-	return ProblemNode{
-		currentValue:     qi.currentValue * qi.remainingNumbers[0],
-		remainingNumbers: qi.remainingNumbers[1:]}
-}
-func (qi *ProblemNode) getConcatChild() ProblemNode {
-	return ProblemNode{
-		currentValue:     concatInts(qi.currentValue, qi.remainingNumbers[0]),
-		remainingNumbers: qi.remainingNumbers[1:],
-	}
 }
 
 func concatInts(int0 int, int1 int) int {
