@@ -1,22 +1,24 @@
 package helpers
 
-import "fmt"
-
 type Queue[T any] struct {
-	items []T
+	items []QueueItem[T]
 	head  int
 }
 
+type QueueItem[T any] struct {
+	Value  T
+	Traces []T
+}
+
 func NewQueue[T any]() *Queue[T] {
-	return &Queue[T]{items: make([]T, 0)}
+	return &Queue[T]{items: make([]QueueItem[T], 0)}
 }
 
-func (q *Queue[T]) Enqueue(value T) {
+func (q *Queue[T]) Enqueue(value QueueItem[T]) {
 	q.items = append(q.items, value)
-	fmt.Printf("New queuelength: %d\n", len(q.items))
 }
 
-func (q *Queue[T]) Dequeue() T {
+func (q *Queue[T]) Dequeue() QueueItem[T] {
 	value := q.items[q.head]
 	q.head++
 	if q.head > len(q.items)/2 {
@@ -30,6 +32,6 @@ func (q *Queue[T]) IsEmpty() bool {
 	return q.head >= len(q.items)
 }
 
-func (q *Queue[T]) Peek() T {
+func (q *Queue[T]) Peek() QueueItem[T] {
 	return q.items[q.head]
 }
