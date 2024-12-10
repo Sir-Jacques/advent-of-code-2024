@@ -12,7 +12,7 @@ type Board struct {
 }
 
 type Guard struct {
-	pos aoc.Position
+	pos aoc.Point
 	dir int
 }
 
@@ -27,7 +27,7 @@ func main() {
 		for x, char := range line {
 			row[x] = char == '#' // Wall
 			if char == '^' {
-				board.startGuard = Guard{pos: aoc.Position{X: x, Y: y}, dir: 0}
+				board.startGuard = Guard{pos: aoc.Point{X: x, Y: y}, dir: 0}
 			}
 		}
 		board.walls[y] = row
@@ -59,7 +59,7 @@ func (g *Guard) isInBounds(board Board) bool {
 	return g.pos.X >= 0 && g.pos.X < len(board.walls[0]) && g.pos.Y >= 0 && g.pos.Y < len(board.walls)
 }
 
-func isValidMove(board Board, pos aoc.Position, xDiff, yDiff int) bool {
+func isValidMove(board Board, pos aoc.Point, xDiff, yDiff int) bool {
 	newX, newY := pos.X+xDiff, pos.Y+yDiff
 	if newX < 0 || newX >= len(board.walls[0]) || newY < 0 || newY >= len(board.walls) {
 		return true // Allowed to walk out of bounds
@@ -67,10 +67,10 @@ func isValidMove(board Board, pos aoc.Position, xDiff, yDiff int) bool {
 	return !board.walls[newY][newX] // If there is a wall, it's not a valid move
 }
 
-func (g *Guard) calculatePath(board Board) (map[aoc.Position]bool, bool) {
+func (g *Guard) calculatePath(board Board) (map[aoc.Point]bool, bool) {
 	// Reset states
 	g.pos, g.dir = board.startGuard.pos, board.startGuard.dir
-	traces := make(map[aoc.Position]bool)
+	traces := make(map[aoc.Point]bool)
 	guardStates := make(map[Guard]bool)
 
 	// Move guard until loop or out of bounds

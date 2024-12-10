@@ -58,8 +58,8 @@ func (p *Problem) solveDFS(includeConcatOperation bool) bool {
 	}
 
 	// Push initial node
-	stack := aoc.NewStack[*aoc.StackItem[int]]()
-	stack.Push(&aoc.StackItem[int]{Accumulator: p.numbers[0], RemainingNumbers: p.numbers[1:]})
+	stack := aoc.NewStack[*StackNode]()
+	stack.Push(&StackNode{Accumulator: p.numbers[0], RemainingNumbers: p.numbers[1:]})
 
 	// DFS
 	for !stack.IsEmpty() {
@@ -89,4 +89,16 @@ func concatInts(int0 int, int1 int) int {
 		factor *= 10
 	}
 	return int0*factor + int1
+}
+
+type StackNode struct {
+	Accumulator      int
+	RemainingNumbers []int
+}
+
+func (sn *StackNode) GetChild(operation func(int, int) int) *StackNode {
+	return &StackNode{
+		Accumulator:      operation(sn.Accumulator, sn.RemainingNumbers[0]),
+		RemainingNumbers: sn.RemainingNumbers[1:],
+	}
 }
