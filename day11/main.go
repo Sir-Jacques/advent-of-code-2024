@@ -11,14 +11,14 @@ type StoneState struct {
 	number, depthRemaining int
 }
 
-var memoizationMap map[StoneState]int
+var dpTable map[StoneState]int
 
 func main() {
 	// Read input
 	input := aoc.ReadInput("input.txt")
 	numbers := aoc.ParseSeperatedInts(input[0], " ")
 
-	memoizationMap = make(map[StoneState]int)
+	dpTable = make(map[StoneState]int)
 
 	// Part 1
 	fmt.Println(calculateTotalStones(numbers, 25))
@@ -42,9 +42,9 @@ func blinkRecursive(n int, depthRemaining int) int {
 		return 1
 	}
 
-	// Perform memoization lookup
+	// Perform DP lookup
 	stoneState := StoneState{number: n, depthRemaining: depthRemaining}
-	lookup, exists := memoizationMap[stoneState]
+	lookup, exists := dpTable[stoneState]
 	if exists {
 		return lookup
 	}
@@ -57,13 +57,13 @@ func blinkRecursive(n int, depthRemaining int) int {
 	// Rule 2; even numbers get split into 2 (add their recursive leaf counts)
 	if len(strconv.Itoa(n))%2 == 0 {
 		int0, int1 := splitInt(n)
-		memoizationMap[stoneState] = blinkRecursive(int0, depthRemaining-1) + blinkRecursive(int1, depthRemaining-1)
-		return memoizationMap[stoneState]
+		dpTable[stoneState] = blinkRecursive(int0, depthRemaining-1) + blinkRecursive(int1, depthRemaining-1)
+		return dpTable[stoneState]
 	}
 
 	// Rule 3; odd numbers get multiplied by 2024
-	memoizationMap[stoneState] = blinkRecursive(n*2024, depthRemaining-1)
-	return memoizationMap[stoneState]
+	dpTable[stoneState] = blinkRecursive(n*2024, depthRemaining-1)
+	return dpTable[stoneState]
 }
 
 // Split int into 2 ints of equal digits
