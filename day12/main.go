@@ -102,11 +102,10 @@ func calculatePerimeter(points []aoc.Point, mapSize aoc.Point) int {
 func calculateCorners(points []aoc.Point, mapSize aoc.Point) int {
 	convexCorners, concaveCorners := 0, 0
 	for _, point := range points {
-		fences := 0
-		// Horizontal
-		hor, ver := false, false
+		fences, hor, ver := 0, false, false
 		for _, diff := range []aoc.Point{{X: 1, Y: 0}, {X: -1, Y: 0}, {X: 0, Y: 1}, {X: 0, Y: -1}} {
-			if hasFence(point.Add(diff), points, mapSize) {
+			neighbor := point.Add(diff)
+			if hasFence(neighbor, points, mapSize) {
 				fences++
 				if diff.X != 0 {
 					hor = true
@@ -115,26 +114,25 @@ func calculateCorners(points []aoc.Point, mapSize aoc.Point) int {
 				}
 			}
 		}
-		if fences == 4 { // Singleton group, 4 corners
+
+		// Singleton group, 4 corners
+		if fences == 4 {
 			convexCorners += 4
 			continue
 		}
-		if hor && ver { // Group with both horizontal and vertical fences must be a corner
+
+		// Group with both horizontal and vertical fences must have "fences - 1" convex corners
+		if hor && ver {
 			convexCorners += fences - 1
 		}
 
-		// Check all possible concave corners
-		if checkConcaveCorner(point, 1, 1, points) {
-			concaveCorners++
-		}
-		if checkConcaveCorner(point, -1, 1, points) {
-			concaveCorners++
-		}
-		if checkConcaveCorner(point, 1, -1, points) {
-			concaveCorners++
-		}
-		if checkConcaveCorner(point, -1, -1, points) {
-			concaveCorners++
+		// Check all concave corners
+		for _, xDiff := range []int{-1, 1} {
+			for _, yDiff := range []int{-1, 1} {
+				if checkConcaveCorner(point, xDiff, yDiff, points) {
+					concaveCorners++
+				}
+			}
 		}
 	}
 	return convexCorners + concaveCorners
@@ -148,11 +146,10 @@ func checkConcaveCorner(point aoc.Point, diffX int, diffY int, points []aoc.Poin
 }
 
 func hasFence(neighbor aoc.Point, currentGroup []aoc.Point, mapSize aoc.Point) bool {
-	// Edge of map
 	if neighbor.OutOfBounds(mapSize) {
-		return true
+		return true // Edge of map
 	}
 
-	// Return if neighbor is part of current group (if so is should be fenced)
+	// Return whether neighbor is part of current group (if not, this is a fence)
 	return !slices.Contains(currentGroup, neighbor)
 }
