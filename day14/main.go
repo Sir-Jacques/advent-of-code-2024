@@ -28,7 +28,7 @@ func main() {
 	q0, q1, q2, q3 := calculateQuads(robots)
 	fmt.Println(q0 * q1 * q2 * q3)
 
-	// Part 2 -> Tedious process of glazing at the terminal and waiting for the answer (7572 urghh...)
+	// Part 2 -> Tedious process of glazing at the terminal and waiting for the christmas tree to appear (7572 urghh...)
 	robots = parseRobots(input)
 	for i := 1; i < 10000; i++ {
 		for k, robot := range robots {
